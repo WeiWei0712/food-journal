@@ -160,3 +160,4 @@ A：GitHub Pages 可在其使用限制內免費用於符合規範的靜態專案
 - Supabase API Keys：https://supabase.com/docs/guides/getting-started/api-keys
 - Supabase Auth URL：https://supabase.com/docs/guides/auth/redirect-urls
 - Supabase SMTP：https://supabase.com/docs/guides/auth/auth-smtp
+網站部署測試
