@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8f3">
+  <meta name="description" content="一個安心記錄每日飲食、熱量與營養素的私人日誌。">
+  <title>好好吃｜每日飲食紀錄</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <section id="config-screen" class="setup-screen hidden" aria-labelledby="config-title">
+    <div class="setup-card">
+      <div class="logo-mark" aria-hidden="true">✳</div>
+      <span class="eyebrow">FIRST TIME SETUP</span>
+      <h1 id="config-title">差一小步，就能開始記錄</h1>
+      <p>請先依照 <a href="./README.md" target="_blank" rel="noopener">README 部署教學</a> 建立 Supabase 專案，並把專案網址及 Publishable key 填入 <code>config.js</code>。</p>
+      <p class="hint">請勿使用 Secret key 或 service_role key；它們不能放在公開網站中。</p>
+    </div>
+  </section>
+
+  <section id="auth-screen" class="auth-screen hidden" aria-label="帳號登入與註冊">
+    <div class="auth-art">
+      <a class="brand brand-white" href="./" aria-label="好好吃首頁"><span class="brand-icon">✳</span><span>好好吃 <small>FOOD JOURNAL</small></span></a>
+      <div class="auth-art-main">
+        <span class="auth-pill">YOUR LITTLE FOOD JOURNAL</span>
+        <h1>把每一餐<br>都過成<span>好日子。</span></h1>
+        <p>不必完美，只要每天比昨天多了解自己一點。</p>
+        <div class="floating-note" aria-hidden="true"><span>🍚</span><span><strong>今天吃了什麼？</strong><small>美味的每一口，都值得留下</small></span><span class="floating-check">✓</span></div>
+      </div>
+      <div class="auth-art-bottom">A SMALL STEP, EVERY DAY. <span>✦</span> EAT WELL, FEEL GOOD.</div>
+    </div>
+    <div class="auth-side">
+      <div class="auth-card">
+        <div class="auth-mobile-brand"><span class="brand-icon">✳</span><strong>好好吃</strong></div>
+        <div id="auth-main-view">
+          <div class="eyebrow">WELCOME TO FOOD JOURNAL</div>
+          <h2 id="auth-heading">歡迎回來！</h2>
+          <p id="auth-subtitle" class="muted">登入你的帳號，接著記下今天的飲食吧。</p>
+          <div id="auth-tabs" class="auth-tabs" role="tablist" aria-label="登入或註冊">
+            <button id="tab-login" type="button" class="active" role="tab" aria-selected="true">登入帳號</button>
+            <button id="tab-signup" type="button" role="tab" aria-selected="false">建立帳號</button>
+          </div>
+          <form id="auth-form" class="stack" autocomplete="on">
+            <label class="field"><span>電子郵件</span><input id="auth-email" type="email" required autocomplete="email" placeholder="yourname@example.com" maxlength="254"></label>
+            <label class="field"><span>密碼</span><input id="auth-password" type="password" required minlength="6" autocomplete="current-password" placeholder="至少 6 個字元"></label>
+            <div id="password-confirm-wrap" class="hidden"><label class="field"><span>確認密碼</span><input id="auth-password-confirm" type="password" minlength="6" autocomplete="new-password" placeholder="再輸入一次密碼"></label></div>
+            <button id="auth-submit" class="btn btn-primary full" type="submit">登入 <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="auth-bottom"><button id="forgot-link" class="text-button" type="button">忘記密碼？</button></div>
+        </div>
+        <div id="auth-forgot-view" class="hidden">
+          <div class="eyebrow">ACCOUNT RECOVERY</div>
+          <h2>重設你的密碼</h2><p class="muted">輸入註冊信箱，我們會寄送重設連結。</p>
+          <form id="forgot-form" class="stack"><label class="field"><span>電子郵件</span><input id="forgot-email" type="email" autocomplete="email" required placeholder="yourname@example.com"></label><button id="forgot-submit" type="submit" class="btn btn-primary full">寄送重設連結</button></form>
+          <button id="back-login" type="button" class="text-button go-back">← 返回登入</button>
+        </div>
+        <div id="auth-recovery-view" class="hidden">
+          <div class="eyebrow">SET NEW PASSWORD</div>
+          <h2>設定新密碼</h2><p class="muted">完成後就能繼續記錄你的飲食。</p>
+          <form id="recovery-form" class="stack">
+            <label class="field"><span>新密碼</span><input id="new-password" type="password" minlength="6" required autocomplete="new-password" placeholder="至少 6 個字元"></label>
+            <label class="field"><span>確認新密碼</span><input id="new-password-confirm" type="password" minlength="6" required autocomplete="new-password" placeholder="再次輸入新密碼"></label>
+            <button id="recovery-submit" type="submit" class="btn btn-primary full">儲存新密碼</button>
+          </form>
+        </div>
+        <p class="auth-fineprint">飲食資料僅供你的帳號查看，並同步保存在 Supabase。</p>
+      </div>
+    </div>
+  </section>
+
+  <div id="dashboard-screen" class="dashboard-screen hidden">
+    <aside class="sidebar">
+      <a class="brand" href="./"><span class="brand-icon">✳</span><span>好好吃 <small>FOOD JOURNAL</small></span></a>
+      <span class="sidebar-label">MY SPACE</span>
+      <nav class="side-nav" aria-label="網站導覽">
+        <a href="#overview" class="nav-link selected"><span class="nav-symbol">◫</span> 每日總覽</a>
+        <a href="#meals" class="nav-link"><span class="nav-symbol">☷</span> 飲食日誌</a>
+        <a href="#trends" class="nav-link"><span class="nav-symbol">▥</span> 週熱量趨勢</a>
+        <button id="settings-side" type="button" class="nav-link"><span class="nav-symbol">⚙</span> 每日目標</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="gentle-card"><span>✿</span><strong>記錄不需要完美</strong><p>每天多一點了解，<br>就是很棒的進步。</p></div>
+        <div class="sidebar-user"><div class="avatar">☺</div><div class="sidebar-user-text"><strong>我的飲食空間</strong><span id="side-email"></span></div></div>
+      </div>
+    </aside>
+
+    <div class="dashboard-main">
+      <header class="topbar">
+        <div class="mobile-logo"><span class="brand-icon">✳</span><strong>好好吃</strong></div>
+        <div class="topbar-crumb">MY JOURNAL <span>/</span> <strong>每日總覽</strong></div>
+        <div class="topbar-actions"><span id="topbar-user" class="topbar-user"></span><button id="signout-button" type="button" class="btn btn-outline btn-small">登出 <span aria-hidden="true">↗</span></button></div>
+      </header>
+
+      <main class="main-content" id="overview">
+        <div class="greeting-row">
+          <div><div class="eyebrow">A FRESH START, EVERY DAY <span>✦</span></div><h1>今天，也要好好吃。<span class="wave">☀</span></h1><p class="subtitle">一點點紀錄，慢慢養成適合自己的節奏。</p></div>
+          <button id="add-top-button" type="button" class="btn btn-primary add-button"><span class="plus-sign">＋</span> 記錄一餐</button>
+        </div>
+
+        <div class="day-toolbar">
+          <div class="day-heading"><span class="calendar-block" aria-hidden="true">▦</span><div><span class="mini-caption">DIARY DATE</span><strong id="selected-date-label">載入中…</strong></div></div>
+          <div class="day-controls"><button id="day-prev" class="icon-button" type="button" aria-label="前一天">‹</button><input id="day-picker" type="date" aria-label="選擇日期"><button id="day-next" class="icon-button" type="button" aria-label="後一天">›</button><button id="day-today" class="btn btn-soft btn-small" type="button">今天</button></div>
+        </div>
+
+        <div id="data-loading" class="loading-note hidden" role="status">正在同步你的飲食紀錄…</div>
+        <section class="summary-grid" aria-label="每日熱量與營養素">
+          <div class="card calorie-card"><div class="section-kicker">TODAY'S CALORIES <span>✳</span></div><div class="calorie-main"><div class="calorie-numbers"><div class="major-number"><strong id="calories-total">0</strong><span>kcal</span></div><p>今日已攝取</p><div id="remaining-badge" class="remaining-badge">還可以攝取 2,000 kcal</div></div><div id="calorie-ring" class="calorie-ring" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="每日熱量目標完成度"><div class="calorie-ring-inner"><strong id="progress-number">0%</strong><small>每日目標</small></div></div></div><div class="calorie-footer"><span>每日熱量目標</span><button id="goal-shortcut" type="button" class="goal-button"><strong id="goal-display">2,000</strong> kcal <span aria-hidden="true">✎</span></button></div></div>
+          <div class="macro-column"><div class="macro-heading">營養素概覽 <span>NUTRIENTS</span></div><div class="macro-cards">
+            <div class="macro-card protein"><div class="macro-icon">◉</div><span>蛋白質</span><div><strong id="protein-total">0.0</strong> <small>g</small></div><span class="macro-english">PROTEIN</span></div>
+            <div class="macro-card carb"><div class="macro-icon">✦</div><span>碳水化合物</span><div><strong id="carb-total">0.0</strong> <small>g</small></div><span class="macro-english">CARBS</span></div>
+            <div class="macro-card fat"><div class="macro-icon">◕</div><span>脂肪</span><div><strong id="fat-total">0.0</strong> <small>g</small></div><span class="macro-english">FAT</span></div>
+          </div><p class="macro-note">✧ 營養素依你填寫的數據加總，非自動辨識。</p></div>
+        </section>
+
+        <section class="lower-grid">
+          <div class="card meals-card" id="meals"><div class="card-heading"><div><span class="section-kicker">YOUR FOOD DIARY</span><h2>飲食日誌 <span class="heading-spark">✳</span></h2><p>將今天吃下的美好，通通記下來。</p></div><button id="add-meal-button" type="button" class="btn btn-outline btn-small">＋ 新增紀錄</button></div><div id="meal-sections" class="meal-sections"></div></div>
+          <div class="right-column"><div class="card trends-card" id="trends"><div class="card-heading"><div><span class="section-kicker">LAST 7 DAYS</span><h2>熱量趨勢</h2><p>以目前選擇的日期為終點。</p></div><span class="chart-decoration">↗</span></div><div class="chart-legend"><span><i class="legend-dot"></i> 攝取熱量</span><span class="goal-legend"><i class="legend-line"></i> 目標 <span id="chart-goal-text">2,000</span> kcal</span></div><div id="weekly-chart" class="weekly-chart" role="img" aria-label="近七天每日熱量長條圖"></div></div>
+          <div class="mini-tip"><span class="tip-emoji">🌱</span><div><strong>小小提醒</strong><p>卡路里是參考值，飲食也要兼顧均衡、飽足感與身體需求。</p></div></div></div>
+        </section>
+        <footer class="page-footer"><span>✳ 好好吃 FOOD JOURNAL</span><span>WITH CARE, EVERY DAY.</span></footer>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="entry-dialog" class="modal-dialog" aria-labelledby="entry-dialog-title">
+    <form id="entry-form" class="dialog-body">
+      <div class="dialog-head"><div><span class="eyebrow">FOOD DIARY</span><h2 id="entry-dialog-title">記錄一餐</h2></div><button type="button" class="modal-close" data-close="entry-dialog" aria-label="關閉">✕</button></div>
+      <div class="form-grid">
+        <label class="field field-wide"><span>食物名稱 <b>*</b></span><input id="entry-name" name="food_name" required maxlength="100" placeholder="例如：雞腿便當"></label>
+        <label class="field"><span>日期 <b>*</b></span><input id="entry-date" name="entry_date" type="date" required></label>
+        <label class="field"><span>餐別 <b>*</b></span><select id="entry-meal" name="meal_type" required><option value="breakfast">早餐</option><option value="lunch">午餐</option><option value="dinner">晚餐</option><option value="snack">點心／其他</option></select></label>
+        <label class="field"><span>份量（選填）</span><input id="entry-serving" name="serving" maxlength="60" placeholder="例如：1 份、150 g"></label>
+        <label class="field"><span>熱量 kcal <b>*</b></span><input id="entry-calories" name="calories" type="number" min="0" max="10000" step="1" required placeholder="例如：580"></label>
+      </div>
+      <div class="nutrition-fieldset"><div class="nutrition-title">營養素 <small>選填，單位 g</small></div><div class="form-grid form-grid-three"><label class="field"><span>蛋白質</span><input id="entry-protein" name="protein_g" type="number" min="0" max="1000" step="0.1" placeholder="0"></label><label class="field"><span>碳水</span><input id="entry-carbs" name="carbs_g" type="number" min="0" max="1000" step="0.1" placeholder="0"></label><label class="field"><span>脂肪</span><input id="entry-fat" name="fat_g" type="number" min="0" max="1000" step="0.1" placeholder="0"></label></div></div>
+      <label class="field"><span>備註（選填）</span><textarea id="entry-notes" name="notes" maxlength="300" rows="2" placeholder="想留給自己的小筆記…"></textarea></label>
+      <p class="form-help">請依食品標示或自己的估算填寫，本站不會自動查詢食物熱量。</p>
+      <div class="dialog-actions"><button type="button" class="btn btn-outline" data-close="entry-dialog">取消</button><button id="entry-save-button" type="submit" class="btn btn-primary">儲存飲食紀錄 →</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="settings-dialog" class="modal-dialog small-dialog" aria-labelledby="settings-title">
+    <form id="settings-form" class="dialog-body"><div class="dialog-head"><div><span class="eyebrow">DAILY GOAL</span><h2 id="settings-title">設定熱量目標</h2></div><button type="button" class="modal-close" data-close="settings-dialog" aria-label="關閉">✕</button></div><p class="muted">這個數字是你自行設定的紀錄目標，不代表個人醫療或營養建議。</p><label class="field"><span>每日目標（kcal）</span><input id="settings-goal" type="number" min="500" max="10000" step="1" required></label><div class="dialog-actions"><button type="button" class="btn btn-outline" data-close="settings-dialog">取消</button><button id="settings-save-button" class="btn btn-primary" type="submit">儲存目標 →</button></div></form>
+  </dialog>
+</body>
+</html>
